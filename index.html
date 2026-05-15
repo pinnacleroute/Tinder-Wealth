@@ -1,0 +1,2435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TinderWealth — AI Investment Advisory</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: #080c14;
+  --bg-secondary: #0d1420;
+  --bg-card: #111927;
+  --bg-card2: #141e2e;
+  --bg-elevated: #182033;
+  --border: rgba(255,255,255,0.07);
+  --border-accent: rgba(99,179,237,0.25);
+  --text-primary: #f0f4ff;
+  --text-secondary: #7a90b0;
+  --text-muted: #4a5f7a;
+  --accent-blue: #4a9eff;
+  --accent-teal: #00d4b4;
+  --accent-gold: #f5c842;
+  --accent-rose: #ff6b8a;
+  --accent-purple: #8b6cf6;
+  --positive: #22d3a5;
+  --negative: #ff5f7e;
+  --gradient-main: linear-gradient(135deg, #1a2a4a 0%, #0d1420 50%, #0a1628 100%);
+  --gradient-card: linear-gradient(145deg, #141e2e 0%, #0f1820 100%);
+  --gradient-accent: linear-gradient(135deg, #4a9eff 0%, #00d4b4 100%);
+  --gradient-gold: linear-gradient(135deg, #f5c842 0%, #ff9f43 100%);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-glow: 0 0 40px rgba(74,158,255,0.12);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: #050810;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+.phone-shell {
+  width: 390px;
+  height: 844px;
+  background: var(--bg-primary);
+  border-radius: 48px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 30px 80px rgba(0,0,0,0.8), 0 0 120px rgba(74,158,255,0.06);
+}
+
+/* Status Bar */
+.status-bar {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px 0 32px;
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+}
+.status-time { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.status-icons { display: flex; gap: 6px; align-items: center; }
+.status-icons svg { width: 16px; height: 16px; fill: var(--text-primary); }
+
+/* Dynamic Island */
+.dynamic-island {
+  width: 120px; height: 34px;
+  background: #000;
+  border-radius: 20px;
+  position: absolute;
+  top: 12px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+}
+
+/* Bottom Nav */
+.bottom-nav {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 84px;
+  background: rgba(10,14,22,0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  padding-top: 10px;
+  z-index: 100;
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 6px 0;
+  transition: all 0.2s;
+}
+.nav-item svg { width: 22px; height: 22px; transition: all 0.2s; }
+.nav-item span { font-family: var(--font-body); font-size: 10px; font-weight: 500; transition: all 0.2s; }
+.nav-item.active svg, .nav-item.active span { color: var(--accent-blue); fill: var(--accent-blue); }
+.nav-item:not(.active) svg, .nav-item:not(.active) span { color: var(--text-muted); fill: var(--text-muted); }
+.nav-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  margin-top: 2px;
+}
+
+/* Screen container */
+.screen {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+  display: none;
+}
+.screen.active { display: block; }
+
+.scroll-area {
+  position: absolute;
+  top: 50px; left: 0; right: 0;
+  bottom: 84px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-area::-webkit-scrollbar { display: none; }
+
+/* ============================
+   ONBOARDING SCREEN
+   ============================ */
+#screen-onboarding {
+  background: var(--bg-primary);
+}
+.onboard-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.onboard-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.18;
+}
+.onboard-orb-1 { width: 280px; height: 280px; background: var(--accent-blue); top: -60px; right: -60px; }
+.onboard-orb-2 { width: 220px; height: 220px; background: var(--accent-teal); bottom: 120px; left: -50px; }
+.onboard-orb-3 { width: 160px; height: 160px; background: var(--accent-purple); top: 40%; left: 30%; }
+
+.onboard-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 28px;
+}
+.onboard-logo-area { padding-top: 100px; margin-bottom: 32px; }
+.logo-mark {
+  width: 56px; height: 56px;
+  background: var(--gradient-accent);
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(74,158,255,0.3);
+}
+.logo-mark svg { width: 32px; height: 32px; fill: white; }
+.onboard-brand {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+.onboard-brand span { background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+.onboard-tagline {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.onboard-features { flex: 1; padding: 20px 0; }
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.feature-item:last-child { border-bottom: none; }
+.feature-icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.feature-icon svg { width: 20px; height: 20px; }
+.fi-blue { background: rgba(74,158,255,0.15); }
+.fi-blue svg { fill: var(--accent-blue); }
+.fi-teal { background: rgba(0,212,180,0.15); }
+.fi-teal svg { fill: var(--accent-teal); }
+.fi-gold { background: rgba(245,200,66,0.15); }
+.fi-gold svg { fill: var(--accent-gold); }
+.fi-purple { background: rgba(139,108,246,0.15); }
+.fi-purple svg { fill: var(--accent-purple); }
+.feature-text h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.feature-text p { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+.onboard-actions { padding-bottom: 40px; }
+.btn-primary {
+  width: 100%; height: 54px;
+  background: var(--gradient-accent);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(74,158,255,0.3);
+  transition: all 0.2s;
+  letter-spacing: 0.2px;
+}
+.btn-primary:active { transform: scale(0.98); }
+.btn-secondary {
+  width: 100%; height: 54px;
+  background: transparent;
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.2s;
+}
+.btn-secondary:active { background: rgba(74,158,255,0.05); }
+.compliance-note {
+  text-align: center;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 16px;
+  line-height: 1.5;
+}
+
+/* ============================
+   LOGIN SCREEN
+   ============================ */
+#screen-login { background: var(--bg-primary); }
+.login-content {
+  padding: 80px 28px 40px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.login-header { margin-bottom: 36px; }
+.back-btn {
+  width: 36px; height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; margin-bottom: 24px;
+}
+.back-btn svg { width: 18px; height: 18px; fill: var(--text-secondary); }
+.login-header h2 { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--text-primary); }
+.login-header p { font-size: 14px; color: var(--text-secondary); margin-top: 6px; }
+
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; display: block; }
+.form-input {
+  width: 100%; height: 52px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 16px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus { border-color: var(--accent-blue); }
+.form-input::placeholder { color: var(--text-muted); }
+.input-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+.biometric-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+.biometric-icon { width: 36px; height: 36px; background: rgba(74,158,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.biometric-icon svg { width: 20px; height: 20px; fill: var(--accent-blue); }
+.biometric-text h4 { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.biometric-text p { font-size: 11px; color: var(--text-secondary); }
+.biometric-badge { margin-left: auto; background: rgba(34,211,165,0.15); color: var(--positive); font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
+
+.secure-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(34,211,165,0.08);
+  border: 1px solid rgba(34,211,165,0.15);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-top: 8px;
+}
+.secure-badge svg { width: 14px; height: 14px; fill: var(--positive); flex-shrink: 0; }
+.secure-badge span { font-size: 11px; color: var(--positive); }
+
+.forgot-link { text-align: right; margin-bottom: 24px; }
+.forgot-link a { font-size: 13px; color: var(--accent-blue); text-decoration: none; }
+
+/* ============================
+   HOME DASHBOARD SCREEN
+   ============================ */
+#screen-home .scroll-area { padding: 0 0 16px; }
+.home-header {
+  padding: 16px 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.greeting-area {}
+.greeting { font-size: 13px; color: var(--text-secondary); }
+.user-name { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
+.header-actions { display: flex; gap: 8px; }
+.icon-btn {
+  width: 38px; height: 38px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
+}
+.icon-btn svg { width: 18px; height: 18px; fill: var(--text-secondary); }
+.notif-badge {
+  position: absolute; top: 6px; right: 6px;
+  width: 8px; height: 8px;
+  background: var(--accent-rose);
+  border-radius: 50%;
+  border: 1.5px solid var(--bg-primary);
+}
+
+/* Portfolio Hero Card */
+.portfolio-hero {
+  margin: 16px 20px 0;
+  background: var(--gradient-accent);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(74,158,255,0.25);
+}
+.portfolio-hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+}
+.portfolio-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; right: 20px;
+  width: 120px; height: 120px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+}
+.ph-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7); letter-spacing: 0.5px; text-transform: uppercase; }
+.ph-value { font-family: var(--font-display); font-size: 38px; font-weight: 800; color: white; margin: 4px 0; letter-spacing: -1px; }
+.ph-change { display: flex; align-items: center; gap: 6px; }
+.ph-change-badge {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.ph-change-text { font-size: 12px; color: rgba(255,255,255,0.75); }
+.ph-metrics {
+  display: flex;
+  gap: 0;
+  margin-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  padding-top: 16px;
+}
+.ph-metric {
+  flex: 1;
+  text-align: center;
+}
+.ph-metric:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.15); }
+.ph-metric-val { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: white; }
+.ph-metric-label { font-size: 10px; color: rgba(255,255,255,0.65); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.3px; }
+
+/* Mini Chart */
+.mini-chart-card {
+  margin: 12px 20px 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+.mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.mc-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.mc-tabs { display: flex; gap: 4px; }
+.mc-tab {
+  font-size: 11px; font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+.mc-tab.active { background: rgba(74,158,255,0.15); color: var(--accent-blue); }
+
+.sparkline { width: 100%; height: 70px; }
+
+/* Section headers */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 20px 10px;
+}
+.section-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.section-link { font-size: 13px; color: var(--accent-blue); font-weight: 500; cursor: pointer; }
+
+/* AI Insight Card */
+.insight-card {
+  margin: 0 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.insight-card:active { transform: scale(0.99); }
+.insight-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+}
+.insight-card.blue::before { background: var(--accent-blue); }
+.insight-card.teal::before { background: var(--accent-teal); }
+.insight-card.gold::before { background: var(--accent-gold); }
+.insight-card.rose::before { background: var(--accent-rose); }
+.insight-card.purple::before { background: var(--accent-purple); }
+
+.ic-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.ic-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.ic-dot.blue { background: var(--accent-blue); }
+.ic-dot.teal { background: var(--accent-teal); }
+.ic-dot.gold { background: var(--accent-gold); }
+.ic-dot.rose { background: var(--accent-rose); }
+.ic-dot.purple { background: var(--accent-purple); }
+.ic-type { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; }
+.ic-type.blue { color: var(--accent-blue); }
+.ic-type.teal { color: var(--accent-teal); }
+.ic-type.gold { color: var(--accent-gold); }
+.ic-type.rose { color: var(--accent-rose); }
+.ic-type.purple { color: var(--accent-purple); }
+.ic-timestamp { margin-left: auto; font-size: 10px; color: var(--text-muted); }
+.ic-body { font-size: 13px; color: var(--text-secondary); line-height: 1.55; }
+.ic-action { margin-top: 10px; font-size: 12px; font-weight: 600; }
+.ic-action.blue { color: var(--accent-blue); }
+.ic-action.teal { color: var(--accent-teal); }
+
+/* Goal Cards Horizontal */
+.goals-scroll {
+  display: flex;
+  gap: 12px;
+  padding: 0 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.goals-scroll::-webkit-scrollbar { display: none; }
+.goal-card-mini {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  min-width: 160px;
+  cursor: pointer;
+}
+.gcm-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px;
+}
+.gcm-icon svg { width: 18px; height: 18px; }
+.gcm-name { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+.gcm-progress-bar {
+  height: 4px;
+  background: var(--bg-elevated);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.gcm-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+.gcm-stats { display: flex; justify-content: space-between; }
+.gcm-pct { font-family: var(--font-display); font-size: 14px; font-weight: 700; }
+.gcm-target { font-size: 10px; color: var(--text-muted); }
+
+/* Quick Actions */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 0 20px;
+}
+.qa-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.qa-item:active { background: var(--bg-elevated); }
+.qa-icon {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.qa-icon svg { width: 16px; height: 16px; }
+.qa-label { font-size: 10px; font-weight: 600; color: var(--text-secondary); text-align: center; }
+
+/* ============================
+   PORTFOLIO SCREEN
+   ============================ */
+#screen-portfolio .scroll-area { padding-bottom: 16px; }
+.screen-header {
+  padding: 16px 20px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.screen-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--text-primary); }
+
+/* Donut Chart */
+.donut-container {
+  margin: 0 20px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+.donut-header { margin-bottom: 16px; }
+.donut-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+.donut-value { font-family: var(--font-display); font-size: 28px; font-weight: 800; color: var(--text-primary); margin-top: 4px; }
+.donut-change { font-size: 13px; color: var(--positive); margin-top: 2px; }
+
+.donut-chart-area { display: flex; align-items: center; gap: 20px; }
+.donut-svg-wrap { position: relative; flex-shrink: 0; }
+.donut-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.donut-center-val { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.donut-center-label { font-size: 9px; color: var(--text-muted); }
+
+.allocation-legend { flex: 1; }
+.legend-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.legend-name { font-size: 12px; color: var(--text-secondary); flex: 1; }
+.legend-pct { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+
+/* Holdings */
+.holdings-card {
+  margin: 0 20px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.holdings-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.holdings-title { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.holding-row {
+  display: flex; align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.holding-row:last-child { border-bottom: none; }
+.holding-row:active { background: var(--bg-elevated); }
+.holding-ticker {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 10px; font-weight: 700;
+  color: var(--text-primary);
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.holding-info { flex: 1; }
+.holding-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.holding-detail { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+.holding-values { text-align: right; }
+.holding-value { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.holding-change { font-size: 11px; font-weight: 600; margin-top: 1px; }
+.holding-change.pos { color: var(--positive); }
+.holding-change.neg { color: var(--negative); }
+
+/* Metric Cards Row */
+.metrics-row {
+  display: flex; gap: 10px;
+  margin: 0 20px 12px;
+}
+.metric-card-sm {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 12px;
+}
+.mc-sm-val { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text-primary); }
+.mc-sm-label { font-size: 10px; color: var(--text-secondary); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.3px; }
+.mc-sm-sub { font-size: 11px; margin-top: 4px; }
+
+/* ============================
+   GOALS SCREEN
+   ============================ */
+#screen-goals .scroll-area { padding: 0 0 16px; }
+.goals-list { padding: 0 20px; }
+.goal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.goal-card:active { transform: scale(0.99); }
+.goal-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.goal-icon {
+  width: 42px; height: 42px;
+  border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.goal-icon svg { width: 22px; height: 22px; }
+.goal-header-text { flex: 1; }
+.goal-name { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.goal-timeline { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.goal-badge {
+  font-size: 10px; font-weight: 700;
+  padding: 4px 8px; border-radius: 6px;
+  letter-spacing: 0.3px;
+}
+.goal-badge.on-track { background: rgba(34,211,165,0.15); color: var(--positive); }
+.goal-badge.needs-attention { background: rgba(245,200,66,0.15); color: var(--accent-gold); }
+.goal-badge.ahead { background: rgba(74,158,255,0.15); color: var(--accent-blue); }
+
+.goal-amounts { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.ga-current { }
+.ga-current-val { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.ga-current-label { font-size: 10px; color: var(--text-muted); }
+.ga-target { text-align: right; }
+.ga-target-val { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text-secondary); }
+.ga-target-label { font-size: 10px; color: var(--text-muted); }
+
+.goal-progress-bar {
+  height: 6px;
+  background: var(--bg-elevated);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.goal-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+.goal-footer { display: flex; justify-content: space-between; align-items: center; }
+.goal-contribution { }
+.gc-amount { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.gc-label { font-size: 10px; color: var(--text-muted); }
+.goal-ai-tip {
+  background: rgba(74,158,255,0.08);
+  border: 1px solid rgba(74,158,255,0.15);
+  border-radius: 8px;
+  padding: 6px 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+.goal-ai-tip svg { width: 12px; height: 12px; fill: var(--accent-blue); flex-shrink: 0; }
+.goal-ai-tip span { font-size: 10px; color: var(--accent-blue); font-weight: 500; }
+
+/* ============================
+   AI ADVISOR SCREEN
+   ============================ */
+#screen-advisor .scroll-area { padding: 0 0 16px; }
+.advisor-hero {
+  margin: 12px 20px 0;
+  background: linear-gradient(135deg, #0d2040 0%, #0a1628 100%);
+  border: 1px solid rgba(74,158,255,0.2);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.advisor-hero::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(74,158,255,0.15) 0%, transparent 70%);
+}
+.ah-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.ai-avatar {
+  width: 46px; height: 46px;
+  background: var(--gradient-accent);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(74,158,255,0.3);
+}
+.ai-avatar svg { width: 24px; height: 24px; fill: white; }
+.ah-text h3 { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.ah-text p { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.ah-status { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+.ah-status-dot { width: 6px; height: 6px; background: var(--positive); border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.3)} }
+.ah-status-text { font-size: 11px; color: var(--positive); }
+
+.ah-summary { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+.ah-highlight { color: var(--accent-blue); font-weight: 600; }
+
+.chat-bubble {
+  margin: 0 20px 10px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  line-height: 1.6;
+  position: relative;
+}
+.chat-bubble.ai {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-bottom-left-radius: 4px;
+}
+.chat-bubble.ai::before {
+  content: '';
+  position: absolute;
+  left: -8px; bottom: 0;
+  width: 0; height: 0;
+  border-right: 8px solid var(--bg-card);
+  border-top: 8px solid transparent;
+}
+.chat-bubble.user {
+  background: rgba(74,158,255,0.12);
+  border: 1px solid rgba(74,158,255,0.2);
+  color: var(--text-primary);
+  border-bottom-right-radius: 4px;
+  margin-left: 40px;
+}
+.bubble-time { font-size: 10px; color: var(--text-muted); margin-top: 6px; }
+
+.chat-input-area {
+  margin: 8px 20px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.chat-input {
+  flex: 1;
+  height: 44px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 0 16px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+}
+.chat-input::placeholder { color: var(--text-muted); }
+.chat-send {
+  width: 44px; height: 44px;
+  background: var(--gradient-accent);
+  border: none;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(74,158,255,0.3);
+}
+.chat-send svg { width: 18px; height: 18px; fill: white; }
+
+.disclaimer-card {
+  margin: 8px 20px;
+  background: rgba(74,158,255,0.05);
+  border: 1px solid rgba(74,158,255,0.1);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.disclaimer-card svg { width: 12px; height: 12px; fill: var(--text-muted); flex-shrink: 0; margin-top: 1px; }
+.disclaimer-card p { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+
+/* ============================
+   NOTIFICATIONS SCREEN
+   ============================ */
+#screen-notifications .scroll-area { padding: 0 0 16px; }
+.notif-filter {
+  display: flex; gap: 8px;
+  padding: 0 20px 14px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.notif-filter::-webkit-scrollbar { display: none; }
+.filter-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.2s;
+}
+.filter-chip.active { background: rgba(74,158,255,0.15); color: var(--accent-blue); border: 1px solid rgba(74,158,255,0.3); }
+.filter-chip:not(.active) { background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border); }
+
+.notif-group-label {
+  padding: 4px 20px 8px;
+  font-size: 11px; font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.notif-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.notif-item:active { background: var(--bg-elevated); }
+.notif-item.unread::before {
+  content: '';
+  position: absolute;
+  left: 8px; top: 50%;
+  transform: translateY(-50%);
+  width: 5px; height: 5px;
+  background: var(--accent-blue);
+  border-radius: 50%;
+}
+.notif-icon-wrap {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.notif-icon-wrap svg { width: 18px; height: 18px; }
+.notif-body { flex: 1; }
+.notif-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.notif-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; line-height: 1.4; }
+.notif-time { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+/* ============================
+   SUBSCRIPTION SCREEN
+   ============================ */
+#screen-subscription .scroll-area { padding: 0 0 16px; }
+.sub-hero {
+  margin: 12px 20px 0;
+  background: linear-gradient(135deg, #1a1428 0%, #100e20 100%);
+  border: 1px solid rgba(139,108,246,0.2);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  text-align: center;
+}
+.sub-hero h3 { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--accent-purple); letter-spacing: 0.3px; }
+.sub-hero .plan-name { font-family: var(--font-display); font-size: 24px; font-weight: 800; color: var(--text-primary); margin: 4px 0; }
+.sub-hero .plan-price { font-size: 28px; font-weight: 800; color: var(--text-primary); }
+.sub-hero .plan-price span { font-size: 14px; color: var(--text-secondary); font-weight: 400; }
+.current-badge {
+  display: inline-block;
+  background: rgba(139,108,246,0.15);
+  border: 1px solid rgba(139,108,246,0.3);
+  color: var(--accent-purple);
+  font-size: 11px; font-weight: 700;
+  padding: 4px 10px; border-radius: 20px;
+  margin-bottom: 10px;
+}
+.renewal-info { font-size: 12px; color: var(--text-secondary); margin-top: 8px; }
+
+.plan-card {
+  margin: 12px 20px 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  transition: all 0.2s;
+}
+.plan-card.featured {
+  border-color: rgba(139,108,246,0.4);
+  background: linear-gradient(135deg, #161228 0%, #111020 100%);
+}
+.plan-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.plan-card-name { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.plan-card-price { font-family: var(--font-display); font-size: 20px; font-weight: 800; }
+.plan-card-price span { font-size: 12px; font-weight: 400; color: var(--text-muted); }
+.plan-features { }
+.plan-feature {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0;
+  font-size: 12px; color: var(--text-secondary);
+}
+.plan-feature svg { width: 14px; height: 14px; flex-shrink: 0; }
+.plan-feature.included svg { fill: var(--positive); }
+.plan-feature.excluded { color: var(--text-muted); }
+.plan-feature.excluded svg { fill: var(--text-muted); }
+
+.upgrade-btn {
+  width: 100%; height: 48px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; border: none;
+  margin-top: 14px;
+  transition: all 0.2s;
+}
+.upgrade-btn.primary { background: linear-gradient(135deg, #8b6cf6 0%, #6b4cf0 100%); color: white; box-shadow: 0 6px 20px rgba(139,108,246,0.3); }
+.upgrade-btn.secondary { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+
+/* ============================
+   PROFILE SCREEN
+   ============================ */
+#screen-profile .scroll-area { padding: 0 0 16px; }
+.profile-hero {
+  padding: 16px 20px 20px;
+  display: flex; align-items: center; gap: 14px;
+}
+.avatar-wrap { position: relative; }
+.avatar {
+  width: 64px; height: 64px;
+  border-radius: 20px;
+  background: var(--gradient-accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 800;
+  color: white;
+}
+.avatar-badge {
+  position: absolute; bottom: -2px; right: -4px;
+  background: var(--accent-purple);
+  border-radius: 6px;
+  padding: 2px 5px;
+  font-size: 9px; font-weight: 700;
+  color: white;
+  border: 1.5px solid var(--bg-primary);
+}
+.profile-info { flex: 1; }
+.profile-name { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text-primary); }
+.profile-email { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.profile-since { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+.edit-btn {
+  width: 34px; height: 34px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.edit-btn svg { width: 16px; height: 16px; fill: var(--text-secondary); }
+
+.risk-profile-card {
+  margin: 0 20px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+.rp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.rp-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.4px; }
+.rp-badge { background: rgba(74,158,255,0.15); color: var(--accent-blue); font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+.risk-meter {
+  height: 8px; background: var(--bg-elevated);
+  border-radius: 4px; overflow: hidden; margin-bottom: 8px;
+  position: relative;
+}
+.risk-fill {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, var(--positive) 0%, var(--accent-gold) 50%, var(--negative) 100%);
+  width: 67%;
+}
+.risk-pointer {
+  position: absolute;
+  top: 50%; left: 67%;
+  transform: translate(-50%, -50%);
+  width: 14px; height: 14px;
+  background: white;
+  border-radius: 50%;
+  border: 2px solid var(--bg-primary);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.risk-labels { display: flex; justify-content: space-between; }
+.risk-label { font-size: 10px; color: var(--text-muted); }
+.risk-score-display { text-align: center; margin-top: 8px; }
+.rsd-val { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--text-primary); }
+.rsd-label { font-size: 11px; color: var(--text-secondary); }
+
+.settings-section { margin: 0 20px 8px; }
+.settings-section-title { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.6px; text-transform: uppercase; padding: 8px 0; }
+.settings-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.settings-item:first-of-type { border-radius: var(--radius-md) var(--radius-md) 0 0; }
+.settings-item:last-of-type { border-radius: 0 0 var(--radius-md) var(--radius-md); border-top: none; }
+.settings-item:only-of-type { border-radius: var(--radius-md); }
+.settings-item:not(:first-of-type) { border-top: none; }
+.settings-item:active { background: var(--bg-elevated); }
+.settings-icon {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.settings-icon svg { width: 15px; height: 15px; }
+.settings-text { flex: 1; }
+.settings-text h4 { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+.settings-text p { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+.settings-arrow svg { width: 14px; height: 14px; fill: var(--text-muted); }
+.settings-value { font-size: 12px; color: var(--text-muted); margin-right: 6px; }
+
+.logout-btn {
+  width: calc(100% - 40px);
+  margin: 16px 20px;
+  height: 50px;
+  background: rgba(255,95,126,0.1);
+  border: 1px solid rgba(255,95,126,0.2);
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: 14px; font-weight: 700;
+  color: var(--negative);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.logout-btn:active { background: rgba(255,95,126,0.15); }
+
+/* ============================
+   EDUCATION SCREEN
+   ============================ */
+#screen-education .scroll-area { padding: 0 0 16px; }
+.edu-categories {
+  display: flex; gap: 8px;
+  padding: 0 20px 14px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.edu-categories::-webkit-scrollbar { display: none; }
+.edu-cat {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.2s;
+  border: 1px solid var(--border);
+}
+.edu-cat.active { background: rgba(0,212,180,0.15); color: var(--accent-teal); border-color: rgba(0,212,180,0.3); }
+.edu-cat:not(.active) { background: var(--bg-card); color: var(--text-muted); }
+
+.edu-card {
+  margin: 0 20px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.edu-card:active { transform: scale(0.99); }
+.edu-card-thumb {
+  height: 120px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px;
+  position: relative;
+  overflow: hidden;
+}
+.edu-card-body { padding: 14px; }
+.edu-card-tags { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.edu-tag {
+  font-size: 10px; font-weight: 700;
+  padding: 3px 7px; border-radius: 5px;
+  letter-spacing: 0.3px;
+}
+.edu-card-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text-primary); line-height: 1.3; margin-bottom: 6px; }
+.edu-card-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+.edu-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+.edu-meta { display: flex; align-items: center; gap: 12px; }
+.edu-meta-item { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-muted); }
+.edu-meta-item svg { width: 12px; height: 12px; fill: var(--text-muted); }
+.edu-progress { display: flex; align-items: center; gap: 6px; }
+.edu-progress-bar { width: 50px; height: 4px; background: var(--bg-elevated); border-radius: 2px; overflow: hidden; }
+.edu-progress-fill { height: 100%; border-radius: 2px; }
+.edu-progress-label { font-size: 10px; color: var(--text-secondary); font-weight: 600; }
+
+/* Animations */
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.screen.active .scroll-area > * { animation: fadeInUp 0.4s ease both; }
+.screen.active .scroll-area > *:nth-child(1) { animation-delay: 0.05s; }
+.screen.active .scroll-area > *:nth-child(2) { animation-delay: 0.1s; }
+.screen.active .scroll-area > *:nth-child(3) { animation-delay: 0.15s; }
+.screen.active .scroll-area > *:nth-child(4) { animation-delay: 0.2s; }
+.screen.active .scroll-area > *:nth-child(5) { animation-delay: 0.25s; }
+
+/* Loading overlay */
+.loading-overlay {
+  position: absolute; inset: 0;
+  background: var(--bg-primary);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 500;
+  transition: opacity 0.5s;
+}
+.loading-logo { animation: fadeInUp 0.5s ease; margin-bottom: 24px; }
+.loading-spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent-blue);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 13px; color: var(--text-muted); margin-top: 16px; }
+
+/* Responsive for small mobile screens */
+@media (max-width: 430px) {
+  .phone-shell { width: 100vw; height: 100vh; border-radius: 0; }
+  body { align-items: flex-start; }
+}
+
+/* Toggle switch */
+.toggle {
+  width: 38px; height: 22px;
+  background: var(--bg-elevated);
+  border-radius: 11px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle.on { background: var(--accent-blue); }
+.toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: left 0.2s;
+}
+.toggle.on .toggle-thumb { left: 19px; }
+
+/* architecture note */
+.arch-note {
+  margin: 12px 20px;
+  background: rgba(74,158,255,0.05);
+  border: 1px solid rgba(74,158,255,0.12);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+.arch-note-title {
+  font-family: var(--font-display);
+  font-size: 12px; font-weight: 700;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.arch-note-title svg { width: 13px; height: 13px; fill: var(--accent-blue); }
+.arch-note p { font-size: 11px; color: var(--text-muted); line-height: 1.6; margin-bottom: 4px; }
+.arch-note p:last-child { margin-bottom: 0; }
+
+/* Tag colors */
+.tag-blue { background: rgba(74,158,255,0.12); color: var(--accent-blue); }
+.tag-teal { background: rgba(0,212,180,0.12); color: var(--accent-teal); }
+.tag-gold { background: rgba(245,200,66,0.12); color: var(--accent-gold); }
+.tag-purple { background: rgba(139,108,246,0.12); color: var(--accent-purple); }
+.tag-rose { background: rgba(255,107,138,0.12); color: var(--accent-rose); }
+</style>
+</head>
+<body>
+
+<div class="phone-shell">
+  <!-- Dynamic Island -->
+  <div class="dynamic-island"></div>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24"><path d="M1 1l22 22M16.72 11.06A11 11 0 019 6.34a11 11 0 01-4.5 3.66 11 11 0 014.4 7h.1a11 11 0 016.72-6"/><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M10.71 5.05A16 16 0 0123 17.5M1 17.5A16 16 0 0114.5 5.5M12 22v.01"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v2"/></svg>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-logo">
+      <div class="logo-mark" style="margin:0 auto">
+        <svg viewBox="0 0 32 32"><path d="M16 2L6 8v8l10 6 10-6V8L16 2zm0 3.5l7 4.2v5.6L16 19.5l-7-4.2V9.7L16 5.5z" fill="white" opacity="0.9"/><circle cx="16" cy="16" r="4" fill="white"/></svg>
+      </div>
+      <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:white;margin-top:10px;text-align:center">Tinder<span style="background:var(--gradient-accent);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Wealth</span></div>
+    </div>
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Securing your session…</div>
+  </div>
+
+  <!-- ============================
+       SCREEN: ONBOARDING
+       ============================ -->
+  <div class="screen" id="screen-onboarding">
+    <div class="onboard-bg">
+      <div class="onboard-orb onboard-orb-1"></div>
+      <div class="onboard-orb onboard-orb-2"></div>
+      <div class="onboard-orb onboard-orb-3"></div>
+    </div>
+    <div class="onboard-content">
+      <div class="onboard-logo-area">
+        <div class="logo-mark">
+          <svg viewBox="0 0 32 32"><path d="M16 2L6 8v8l10 6 10-6V8L16 2zm0 3.5l7 4.2v5.6L16 19.5l-7-4.2V9.7L16 5.5z" fill="white" opacity="0.9"/><circle cx="16" cy="16" r="4" fill="white"/></svg>
+        </div>
+        <div class="onboard-brand">Tinder<span>Wealth</span></div>
+        <div class="onboard-tagline">AI-powered financial advisory. Personalized for every milestone in your life.</div>
+      </div>
+      <div class="onboard-features">
+        <div class="feature-item">
+          <div class="feature-icon fi-blue">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+          </div>
+          <div class="feature-text">
+            <h4>AI Portfolio Intelligence</h4>
+            <p>Real-time insights powered by institutional-grade models</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon fi-teal">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <div class="feature-text">
+            <h4>Goal-Based Investing</h4>
+            <p>Retirement, home, education — track every milestone</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon fi-gold">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+          </div>
+          <div class="feature-text">
+            <h4>SEC-Registered Advisor</h4>
+            <p>Compliant, fiduciary guidance you can trust</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon fi-purple">
+            <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+          </div>
+          <div class="feature-text">
+            <h4>Bank-Level Security</h4>
+            <p>256-bit encryption, biometric auth, and SOC 2 compliance</p>
+          </div>
+        </div>
+      </div>
+      <div class="onboard-actions">
+        <button class="btn-primary" onclick="navigateTo('login')">Get Started — It's Free</button>
+        <button class="btn-secondary" onclick="navigateTo('login')">Log In to Your Account</button>
+        <div class="compliance-note">TinderWealth is a registered investment advisor. Investing involves risk. Past performance does not guarantee future results. Not FDIC insured.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       SCREEN: LOGIN
+       ============================ -->
+  <div class="screen" id="screen-login">
+    <div class="login-content">
+      <div class="login-header">
+        <div class="back-btn" onclick="navigateTo('onboarding')">
+          <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </div>
+        <h2>Welcome back</h2>
+        <p>Sign in to your TinderWealth account</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" placeholder="alex.morgan@email.com" value="alex.morgan@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" placeholder="••••••••••••" value="••••••••••••">
+      </div>
+      <div class="forgot-link"><a href="#">Forgot password?</a></div>
+
+      <div class="biometric-row" onclick="loginWithBio()">
+        <div class="biometric-icon">
+          <svg viewBox="0 0 24 24"><path d="M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.68-.2-.13-.24-.04-.55.2-.68C7.82 2.52 9.86 2 12.01 2c2.13 0 3.99.47 6.03 1.52.25.13.34.43.21.67-.09.18-.26.28-.44.28zM3.5 9.72c-.1 0-.2-.03-.29-.09-.23-.16-.28-.47-.12-.7.99-1.4 2.25-2.5 3.75-3.27C9.98 4.04 14 4.03 17.15 6.65c1.5.77 2.76 1.86 3.75 3.25.16.22.11.54-.12.7-.23.16-.54.11-.7-.12-.9-1.26-2.04-2.25-3.39-2.94-2.87-2.43-6.62-2.44-9.52-.01-1.36.69-2.5 1.68-3.4 2.94-.11.14-.27.25-.27.25zm6.25 12.07c-.13 0-.26-.05-.35-.15-.87-.87-1.34-1.43-2.01-2.64-.69-1.23-1.05-2.73-1.05-4.34 0-2.97 2.54-5.39 5.66-5.39s5.66 2.42 5.66 5.39c0 .28-.22.5-.5.5s-.5-.22-.5-.5c0-2.42-2.09-4.39-4.66-4.39-2.57 0-4.66 1.97-4.66 4.39 0 1.44.32 2.77.93 3.85.64 1.15 1.08 1.64 1.85 2.42.19.2.19.51 0 .71-.11.1-.24.15-.37.15zm7.17-1.45c-1.19.0-2.24-.3-3.1-.89-1.49-1.01-2.38-2.65-2.38-4.39 0-.28.22-.5.5-.5s.5.22.5.5c0 1.41.72 2.74 1.94 3.56.71.48 1.54.71 2.54.71.24 0 .64-.03 1.04-.1.27-.05.53.13.58.41.05.27-.13.53-.41.58-.57.11-1.07.12-1.21.12zM14.91 22c-.04 0-.09-.01-.13-.02-1.59-.44-2.63-1.03-3.72-2.1-1.4-1.39-2.17-3.24-2.17-5.22 0-1.62 1.38-2.94 3.08-2.94 1.7 0 3.08 1.32 3.08 2.94 0 1.07.93 1.94 2.08 1.94s2.08-.87 2.08-1.94c0-3.77-3.25-6.83-7.25-6.83-2.84 0-5.44 1.58-6.61 4.03-.39.81-.59 1.76-.59 2.8 0 .78.07 2.01.67 3.61.1.26-.03.55-.29.64-.26.1-.55-.04-.64-.29-.49-1.31-.73-2.61-.73-3.96 0-1.2.23-2.29.68-3.24 1.33-2.79 4.28-4.59 7.51-4.59 4.55 0 8.25 3.51 8.25 7.83 0 1.62-1.38 2.94-3.08 2.94s-3.08-1.32-3.08-2.94c0-1.07-.93-1.94-2.08-1.94s-2.08.87-2.08 1.94c0 1.71.66 3.31 1.87 4.51.95.94 1.86 1.46 3.27 1.85.27.07.42.35.35.61-.05.23-.26.38-.47.38z"/></svg>
+        </div>
+        <div class="biometric-text">
+          <h4>Face ID / Biometric Login</h4>
+          <p>Enabled for this device</p>
+        </div>
+        <div class="biometric-badge">Active</div>
+      </div>
+
+      <div class="secure-badge">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+        <span>256-bit TLS encryption · Token-based auth · SOC 2 Type II compliant</span>
+      </div>
+
+      <div style="margin-top: auto; padding-top: 24px;">
+        <button class="btn-primary" onclick="doLogin()">Sign In Securely</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       SCREEN: HOME DASHBOARD
+       ============================ -->
+  <div class="screen" id="screen-home">
+    <div class="scroll-area">
+      <div class="home-header">
+        <div class="greeting-area">
+          <div class="greeting">Good morning 👋</div>
+          <div class="user-name">Alex Morgan</div>
+        </div>
+        <div class="header-actions">
+          <div class="icon-btn" onclick="navigateTo('notifications')">
+            <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            <div class="notif-badge"></div>
+          </div>
+          <div class="icon-btn" onclick="setTab('profile')">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Portfolio Hero -->
+      <div class="portfolio-hero">
+        <div class="ph-label">Total Portfolio Value</div>
+        <div class="ph-value">$184,250</div>
+        <div class="ph-change">
+          <div class="ph-change-badge">+$1,240 (+0.68%)</div>
+          <div class="ph-change-text">today · Advisory Plus ✦</div>
+        </div>
+        <div class="ph-metrics">
+          <div class="ph-metric">
+            <div class="ph-metric-val">+14.2%</div>
+            <div class="ph-metric-label">YTD Return</div>
+          </div>
+          <div class="ph-metric">
+            <div class="ph-metric-val">67/100</div>
+            <div class="ph-metric-label">Risk Score</div>
+          </div>
+          <div class="ph-metric">
+            <div class="ph-metric-val">82%</div>
+            <div class="ph-metric-label">Diversified</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mini Chart -->
+      <div class="mini-chart-card">
+        <div class="mc-header">
+          <div class="mc-title">Performance</div>
+          <div class="mc-tabs">
+            <div class="mc-tab active">1W</div>
+            <div class="mc-tab">1M</div>
+            <div class="mc-tab">3M</div>
+            <div class="mc-tab">1Y</div>
+          </div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 330 70" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#4a9eff" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#4a9eff" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M0,50 L20,48 L40,45 L60,47 L80,40 L100,38 L120,35 L140,30 L160,32 L180,28 L200,25 L220,22 L240,20 L260,18 L280,15 L300,12 L320,10 L330,8" fill="none" stroke="#4a9eff" stroke-width="2" stroke-linecap="round"/>
+          <path d="M0,50 L20,48 L40,45 L60,47 L80,40 L100,38 L120,35 L140,30 L160,32 L180,28 L200,25 L220,22 L240,20 L260,18 L280,15 L300,12 L320,10 L330,8 L330,70 L0,70 Z" fill="url(#sparkGrad)"/>
+        </svg>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="section-header" style="padding-bottom:8px">
+        <div class="section-title">Quick Actions</div>
+      </div>
+      <div class="quick-actions">
+        <div class="qa-item" onclick="setTab('portfolio')">
+          <div class="qa-icon" style="background:rgba(74,158,255,0.12)"><svg viewBox="0 0 24 24" style="fill:var(--accent-blue)"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div>
+          <div class="qa-label">Portfolio</div>
+        </div>
+        <div class="qa-item" onclick="setTab('goals')">
+          <div class="qa-icon" style="background:rgba(0,212,180,0.12)"><svg viewBox="0 0 24 24" style="fill:var(--accent-teal)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg></div>
+          <div class="qa-label">Goals</div>
+        </div>
+        <div class="qa-item" onclick="setTab('advisor')">
+          <div class="qa-icon" style="background:rgba(139,108,246,0.12)"><svg viewBox="0 0 24 24" style="fill:var(--accent-purple)"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div>
+          <div class="qa-label">AI Advisor</div>
+        </div>
+        <div class="qa-item" onclick="setTab('education')">
+          <div class="qa-icon" style="background:rgba(245,200,66,0.12)"><svg viewBox="0 0 24 24" style="fill:var(--accent-gold)"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg></div>
+          <div class="qa-label">Learn</div>
+        </div>
+      </div>
+
+      <!-- AI Insights -->
+      <div class="section-header">
+        <div class="section-title">AI Insights</div>
+        <div class="section-link" onclick="setTab('advisor')">See all →</div>
+      </div>
+
+      <div class="insight-card blue">
+        <div class="ic-header">
+          <div class="ic-dot blue"></div>
+          <div class="ic-type blue">Rebalancing Alert</div>
+          <div class="ic-timestamp">2h ago</div>
+        </div>
+        <div class="ic-body">Your US Equities allocation has drifted to 68% — above your 60% target. Consider shifting ~$8,200 toward International ETFs to maintain your moderate-growth profile.</div>
+        <div class="ic-action blue">View Rebalancing Plan →</div>
+      </div>
+
+      <div class="insight-card teal">
+        <div class="ic-header">
+          <div class="ic-dot teal"></div>
+          <div class="ic-type teal">Goal Insight</div>
+          <div class="ic-timestamp">Yesterday</div>
+        </div>
+        <div class="ic-body">You're tracking ahead on Retirement by 14 months. Increasing monthly contributions by $200 could advance your target date to age 62.</div>
+        <div class="ic-action teal">Adjust Contribution →</div>
+      </div>
+
+      <!-- Goals Summary -->
+      <div class="section-header">
+        <div class="section-title">Financial Goals</div>
+        <div class="section-link" onclick="setTab('goals')">View all →</div>
+      </div>
+
+      <div class="goals-scroll">
+        <div class="goal-card-mini">
+          <div class="gcm-icon" style="background:rgba(74,158,255,0.12)">
+            <svg viewBox="0 0 24 24" style="fill:var(--accent-blue)"><path d="M20 4H4v2l8 5 8-5V4zM4 8v12h16V8l-8 5-8-5z"/></svg>
+          </div>
+          <div class="gcm-name">Retirement</div>
+          <div class="gcm-progress-bar"><div class="gcm-progress-fill" style="width:62%;background:var(--accent-blue)"></div></div>
+          <div class="gcm-stats">
+            <div class="gcm-pct" style="color:var(--accent-blue)">62%</div>
+            <div class="gcm-target">$1.2M</div>
+          </div>
+        </div>
+        <div class="goal-card-mini">
+          <div class="gcm-icon" style="background:rgba(34,211,165,0.12)">
+            <svg viewBox="0 0 24 24" style="fill:var(--positive)"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          </div>
+          <div class="gcm-name">Home Purchase</div>
+          <div class="gcm-progress-bar"><div class="gcm-progress-fill" style="width:45%;background:var(--positive)"></div></div>
+          <div class="gcm-stats">
+            <div class="gcm-pct" style="color:var(--positive)">45%</div>
+            <div class="gcm-target">$120K</div>
+          </div>
+        </div>
+        <div class="goal-card-mini">
+          <div class="gcm-icon" style="background:rgba(245,200,66,0.12)">
+            <svg viewBox="0 0 24 24" style="fill:var(--accent-gold)"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+          </div>
+          <div class="gcm-name">Child Education</div>
+          <div class="gcm-progress-bar"><div class="gcm-progress-fill" style="width:28%;background:var(--accent-gold)"></div></div>
+          <div class="gcm-stats">
+            <div class="gcm-pct" style="color:var(--accent-gold)">28%</div>
+            <div class="gcm-target">$80K</div>
+          </div>
+        </div>
+        <div class="goal-card-mini">
+          <div class="gcm-icon" style="background:rgba(255,107,138,0.12)">
+            <svg viewBox="0 0 24 24" style="fill:var(--accent-rose)"><path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-4h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5z"/></svg>
+          </div>
+          <div class="gcm-name">Emergency Fund</div>
+          <div class="gcm-progress-bar"><div class="gcm-progress-fill" style="width:80%;background:var(--accent-rose)"></div></div>
+          <div class="gcm-stats">
+            <div class="gcm-pct" style="color:var(--accent-rose)">80%</div>
+            <div class="gcm-target">$30K</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:8px"></div>
+    </div>
+  </div>
+
+  <!-- ============================
+       SCREEN: PORTFOLIO
+       ============================ -->
+  <div class="screen" id="screen-portfolio">
+    <div class="scroll-area">
+      <div class="screen-header">
+        <div class="screen-title">Portfolio</div>
+        <div style="display:flex;gap:8px">
+          <div class="icon-btn"><svg viewBox="0 0 24 24" style="fill:var(--text-secondary)"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></div>
+        </div>
+      </div>
+
+      <!-- Metrics row -->
+      <div class="metrics-row">
+        <div class="metric-card-sm">
+          <div class="mc-sm-val">$184,250</div>
+          <div class="mc-sm-label">Total Value</div>
+          <div class="mc-sm-sub" style="color:var(--positive)">↑ +$1,240 today</div>
+        </div>
+        <div class="metric-card-sm">
+          <div class="mc-sm-val">+14.2%</div>
+          <div class="mc-sm-label">YTD Return</div>
+          <div class="mc-sm-sub" style="color:var(--text-muted)">vs 11.4% benchmark</div>
+        </div>
+        <div class="metric-card-sm">
+          <div class="mc-sm-val">82</div>
+          <div class="mc-sm-label">Divers. Score</div>
+          <div class="mc-sm-sub" style="color:var(--positive)">↑ Good</div>
+        </div>
+      </div>
+
+      <!-- Donut Chart - Asset Allocation -->
+      <div class="donut-container">
+        <div class="donut-header">
+          <div class="donut-title">Asset Allocation</div>
+          <div class="donut-value">$184,250</div>
+          <div class="donut-change">+$24,180 YTD (+14.2%)</div>
+        </div>
+        <div class="donut-chart-area">
+          <div class="donut-svg-wrap">
+            <svg width="130" height="130" viewBox="0 0 130 130">
+              <!-- US Equity 45% -->
+              <circle cx="65" cy="65" r="48" fill="none" stroke="#4a9eff" stroke-width="18" stroke-dasharray="135.7 166.3" stroke-dashoffset="0"/>
+              <!-- Intl Equity 20% -->
+              <circle cx="65" cy="65" r="48" fill="none" stroke="#00d4b4" stroke-width="18" stroke-dasharray="60.3 241.7" stroke-dashoffset="-135.7"/>
+              <!-- Fixed Income 20% -->
+              <circle cx="65" cy="65" r="48" fill="none" stroke="#8b6cf6" stroke-width="18" stroke-dasharray="60.3 241.7" stroke-dashoffset="-196"/>
+              <!-- Real Estate 8% -->
+              <circle cx="65" cy="65" r="48" fill="none" stroke="#f5c842" stroke-width="18" stroke-dasharray="24.1 277.9" stroke-dashoffset="-256.3"/>
+              <!-- Cash 7% -->
+              <circle cx="65" cy="65" r="48" fill="none" stroke="#ff6b8a" stroke-width="18" stroke-dasharray="21.1 280.9" stroke-dashoffset="-280.4"/>
+            </svg>
+            <div class="donut-center">
+              <div class="donut-center-val">5 Assets</div>
+              <div class="donut-center-label">Classes</div>
+            </div>
+          </div>
+          <div class="allocation-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#4a9eff"></div><div class="legend-name">US Equity</div><div class="legend-pct">45%</div></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#00d4b4"></div><div class="legend-name">Intl Equity</div><div class="legend-pct">20%</div></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#8b6cf6"></div><div class="legend-name">Fixed Income</div><div class="legend-pct">20%</div></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#f5c842"></div><div class="legend-name">Real Estate</div><div class="legend-pct">8%</div></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#ff6b8a"></div><div class="legend-name">Cash</div><div class="legend-pct">7%</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Holdings -->
+      <div class="holdings-card">
+        <div class="holdings-header">
+          <div class="holdings-title">Holdings</div>
+          <div style="font-size:11px;color:var(--text-muted)">Morningstar data · Mock</div>
+        </div>
+        <div class="holding-row">
+          <div class="holding-ticker" style="background:rgba(74,158,255,0.1);color:var(--accent-blue)">VTI</div>
+          <div class="holding-info">
+            <div class="holding-name">Vanguard Total Stock ETF</div>
+            <div class="holding-detail">245.3 shares · Nasdaq · Large Blend</div>
+          </div>
+          <div class="holding-values">
+            <div class="holding-value">$56,420</div>
+            <div class="holding-change pos">+2.14%</div>
+          </div>
+        </div>
+        <div class="holding-row">
+          <div class="holding-ticker" style="background:rgba(0,212,180,0.1);color:var(--accent-teal)">MSFT</div>
+          <div class="holding-info">
+            <div class="holding-name">Microsoft Corporation</div>
+            <div class="holding-detail">68 shares · NASDAQ · Tech</div>
+          </div>
+          <div class="holding-values">
+            <div class="holding-value">$28,900</div>
+            <div class="holding-change pos">+0.87%</div>
+          </div>
+        </div>
+        <div class="holding-row">
+          <div class="holding-ticker" style="background:rgba(139,108,246,0.1);color:var(--accent-purple)">AGG</div>
+          <div class="holding-info">
+            <div class="holding-name">iShares Core US Aggregate Bond</div>
+            <div class="holding-detail">420 shares · NYSE · Fixed Income</div>
+          </div>
+          <div class="holding-values">
+            <div class="holding-value">$24,150</div>
+            <div class="holding-change neg">-0.12%</div>
+          </div>
+        </div>
+        <div class="holding-row">
+          <div class="holding-ticker" style="background:rgba(0,212,180,0.1);color:var(--accent-teal)">VXUS</div>
+          <div class="holding-info">
+            <div class="holding-name">Vanguard Total Intl Stock ETF</div>
+            <div class="holding-detail">510 shares · Nasdaq · Foreign</div>
+          </div>
+          <div class="holding-values">
+            <div class="holding-value">$22,340</div>
+            <div class="holding-change pos">+1.32%</div>
+          </div>
+        </div>
+        <div class="holding-row">
+          <div class="holding-ticker" style="background:rgba(245,200,66,0.1);color:var(--accent-gold)">VNQ</div>
+          <div class="holding-info">
+            <div class="holding-name">Vanguard Real Estate ETF</div>
+            <div class="holding-detail">185 shares · NYSE · REIT</div>
+          </div>
+          <div class="holding-values">
+            <div class="holding-value">$17,310</div>
+            <div class="holding-change neg">-0.45%</div>
+          </div>
+        </div>
+        <div class="holding-row">
+          <div class="holding-ticker" style="background:rgba(74,158,255,0.1);color:var(--accent-blue)">AAPL</div>
+          <div class="holding-info">
+            <div class="holding-name">Apple Inc.</div>
+            <div class="holding-detail">52 shares · NASDAQ · Tech</div>
+          </div>
+          <div class="holding-values">
+            <div class="holding-value">$11,830</div>
+            <div class="holding-change pos">+1.05%</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:4px"></div>
+    </div>
+  </div>
+
+  <!-- ============================
+       SCREEN: GOALS
+       ============================ -->
+  <div class="screen" id="screen-goals">
+    <div class="scroll-area">
+      <div class="screen-header">
+        <div class="screen-title">Financial Goals</div>
+        <div class="icon-btn"><svg viewBox="0 0 24 24" style="fill:var(--accent-blue)"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+      </div>
+      <div class="goals-list">
+
+        <div class="goal-card">
+          <div class="goal-card-header">
+            <div class="goal-icon" style="background:rgba(74,158,255,0.12)">
+              <svg viewBox="0 0 24 24" style="fill:var(--accent-blue)"><path d="M20 4H4v2l8 5 8-5V4zM4 8v12h16V8l-8 5-8-5z"/></svg>
+            </div>
+            <div class="goal-header-text">
+              <div class="goal-name">Retirement Plan</div>
+              <div class="goal-timeline">Target: Age 65 · Est. 2047</div>
+            </div>
+            <div class="goal-badge on-track">On Track</div>
+          </div>
+          <div class="goal-amounts">
+            <div class="ga-current"><div class="ga-current-val">$744,300</div><div class="ga-current-label">Current</div></div>
+            <div class="ga-target"><div class="ga-target-val">$1,200,000</div><div class="ga-target-label">Target</div></div>
+          </div>
+          <div class="goal-progress-bar"><div class="goal-progress-fill" style="width:62%;background:linear-gradient(90deg,#4a9eff,#00d4b4)"></div></div>
+          <div class="goal-footer">
+            <div class="goal-contribution"><div class="gc-amount">$1,450 / mo</div><div class="gc-label">Recommended</div></div>
+            <div class="goal-ai-tip">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+              <span>+$200/mo saves 14 months</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="goal-card">
+          <div class="goal-card-header">
+            <div class="goal-icon" style="background:rgba(34,211,165,0.12)">
+              <svg viewBox="0 0 24 24" style="fill:var(--positive)"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            </div>
+            <div class="goal-header-text">
+              <div class="goal-name">Home Purchase</div>
+              <div class="goal-timeline">Target: Q3 2027 · 26 months</div>
+            </div>
+            <div class="goal-badge needs-attention">Needs Boost</div>
+          </div>
+          <div class="goal-amounts">
+            <div class="ga-current"><div class="ga-current-val">$54,000</div><div class="ga-current-label">Current</div></div>
+            <div class="ga-target"><div class="ga-target-val">$120,000</div><div class="ga-target-label">Down Payment</div></div>
+          </div>
+          <div class="goal-progress-bar"><div class="goal-progress-fill" style="width:45%;background:linear-gradient(90deg,#22d3a5,#4a9eff)"></div></div>
+          <div class="goal-footer">
+            <div class="goal-contribution"><div class="gc-amount">$2,540 / mo</div><div class="gc-label">Recommended</div></div>
+            <div class="goal-ai-tip">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+              <span>Add $500 to stay on track</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="goal-card">
+          <div class="goal-card-header">
+            <div class="goal-icon" style="background:rgba(245,200,66,0.12)">
+              <svg viewBox="0 0 24 24" style="fill:var(--accent-gold)"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+            </div>
+            <div class="goal-header-text">
+              <div class="goal-name">Child Education (529)</div>
+              <div class="goal-timeline">Target: 2035 · 9 years</div>
+            </div>
+            <div class="goal-badge on-track">On Track</div>
+          </div>
+          <div class="goal-amounts">
+            <div class="ga-current"><div class="ga-current-val">$22,400</div><div class="ga-current-label">Current</div></div>
+            <div class="ga-target"><div class="ga-target-val">$80,000</div><div class="ga-target-label">Target</div></div>
+          </div>
+          <div class="goal-progress-bar"><div class="goal-progress-fill" style="width:28%;background:linear-gradient(90deg,#f5c842,#ff9f43)"></div></div>
+          <div class="goal-footer">
+            <div class="goal-contribution"><div class="gc-amount">$680 / mo</div><div class="gc-label">Recommended</div></div>
+            <div class="goal-ai-tip">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+              <span>529 tax advantage available</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="goal-card">
+          <div class="goal-card-header">
+            <div class="goal-icon" style="background:rgba(255,107,138,0.12)">
+              <svg viewBox="0 0 24 24" style="fill:var(--accent-rose)"><path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-4h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5z"/></svg>
+            </div>
+            <div class="goal-header-text">
+              <div class="goal-name">Emergency Fund</div>
+              <div class="goal-timeline">6-month buffer · HYSA</div>
+            </div>
+            <div class="goal-badge ahead">Ahead</div>
+          </div>
+          <div class="goal-amounts">
+            <div class="ga-current"><div class="ga-current-val">$24,000</div><div class="ga-current-label">Current</div></div>
+            <div class="ga-target"><div class="ga-target-val">$30,000</div><div class="ga-target-label">Target</div></div>
+          </div>
+          <div class="goal-progress-bar"><div class="goal-progress-fill" style="width:80%;background:linear-gradient(90deg,#ff6b8a,#ff9f43)"></div></div>
+          <div class="goal-footer">
+            <div class="goal-contribution"><div class="gc-amount">$250 / mo</div><div class="gc-label">Recommended</div></div>
+            <div class="goal-ai-tip">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+              <span>Fully funded in ~4 months</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       SCREEN: AI ADVISOR
+       ============================ -->
+  <div class="screen" id="screen-advisor">
+    <div class="scroll-area">
+      <div class="screen-header">
+        <div class="screen-title">AI Advisor</div>
+        <div class="icon-btn"><svg viewBox="0 0 24 24" style="fill:var(--text-secondary)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></div>
+      </div>
+
+      <!-- AI Hero -->
+      <div class="advisor-hero">
+        <div class="ah-top">
+          <div class="ai-avatar">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+          </div>
+          <div class="ah-text">
+            <h3>WealthAI Assistant</h3>
+            <p>Powered by TinderWealth Intelligence · SEC Advisory</p>
+          </div>
+          <div class="ah-status">
+            <div class="ah-status-dot"></div>
+            <div class="ah-status-text">Live</div>
+          </div>
+        </div>
+        <div class="ah-summary">Your portfolio is <span class="ah-highlight">performing above benchmark</span> (+2.8%). US Equity has drifted beyond target — a <span class="ah-highlight">rebalancing opportunity</span> exists this week.</div>
+      </div>
+
+      <!-- Insight Cards -->
+      <div class="section-header" style="padding-top:14px">
+        <div class="section-title">Today's Insights</div>
+      </div>
+
+      <div class="insight-card blue">
+        <div class="ic-header">
+          <div class="ic-dot blue"></div>
+          <div class="ic-type blue">Portfolio Drift</div>
+          <div class="ic-timestamp">2h ago</div>
+        </div>
+        <div class="ic-body">US Equities at 68% vs. 60% target. Based on your moderate-growth profile, shifting ~$8,200 to International Equity ETFs would improve diversification without materially changing your risk score.</div>
+        <div class="ic-action blue">Review Rebalancing →</div>
+      </div>
+
+      <div class="insight-card gold">
+        <div class="ic-header">
+          <div class="ic-dot gold"></div>
+          <div class="ic-type gold">Tax Efficiency</div>
+          <div class="ic-timestamp">1d ago</div>
+        </div>
+        <div class="ic-body">You have ~$4,200 in unrealized losses in AGG that could offset capital gains through tax-loss harvesting before year-end. This is not tax advice — consult your CPA for specifics.</div>
+      </div>
+
+      <div class="insight-card teal">
+        <div class="ic-header">
+          <div class="ic-dot teal"></div>
+          <div class="ic-type teal">Retirement Insight</div>
+          <div class="ic-timestamp">2d ago</div>
+        </div>
+        <div class="ic-body">You're currently tracking 14 months ahead of your retirement goal. If you increase monthly contributions by $200, you could retire at 62 with the same target corpus.</div>
+        <div class="ic-action teal">Adjust Plan →</div>
+      </div>
+
+      <div class="insight-card rose">
+        <div class="ic-header">
+          <div class="ic-dot rose"></div>
+          <div class="ic-type rose">Market Alert</div>
+          <div class="ic-timestamp">3d ago</div>
+        </div>
+        <div class="ic-body">Federal Reserve held rates steady at 5.25–5.50%. Bond allocations may benefit from duration extension. Your Fixed Income position remains conservatively positioned — no action required at this time.</div>
+      </div>
+
+      <!-- Chat interface -->
+      <div class="section-header">
+        <div class="section-title">Ask WealthAI</div>
+      </div>
+
+      <div class="chat-bubble ai">
+        Hello Alex! I've reviewed your portfolio and goals. I'm ready to answer questions about your investments, risk exposure, or retirement strategy. What would you like to know today?
+        <div class="bubble-time">WealthAI · Just now</div>
+      </div>
+
+      <div class="chat-bubble user">
+        Should I rebalance my portfolio this month?
+        <div class="bubble-time" style="text-align:right">Alex · Just now</div>
+      </div>
+
+      <div class="chat-bubble ai">
+        Based on your current allocation, yes — a modest rebalancing is advisable. Your US Equity position is 8% above target. I'd suggest a phased approach over 2–3 weeks to avoid timing risk. Shall I generate a rebalancing proposal?
+        <div class="bubble-time">WealthAI · Just now</div>
+      </div>
+
+      <div class="chat-input-area">
+        <input class="chat-input" type="text" placeholder="Ask about your portfolio, goals, or market…">
+        <button class="chat-send">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+
+      <div class="disclaimer-card">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <p>AI insights are informational and do not constitute personalized investment advice. Past performance does not guarantee future results. TinderWealth is a registered investment advisor. All suggestions are based on mock data.</p>
+      </div>
+
+      <div style="height:4px"></div>
+    </div>
+  </div>
+
+  <!-- ============================
+       SCREEN: NOTIFICATIONS
+       ============================ -->
+  <div class="screen" id="screen-notifications">
+    <div class="scroll-area">
+      <div class="screen-header">
+        <div class="screen-title">Notifications</div>
+        <div style="font-size:12px;color:var(--accent-blue);cursor:pointer">Mark all read</div>
+      </div>
+
+      <div class="notif-filter">
+        <div class="filter-chip active">All</div>
+        <div class="filter-chip">Alerts</div>
+        <div class="filter-chip">Goals</div>
+        <div class="filter-chip">Market</div>
+        <div class="filter-chip">Billing</div>
+      </div>
+
+      <div class="notif-group-label">Today</div>
+
+      <div class="notif-item unread">
+        <div class="notif-icon-wrap" style="background:rgba(255,95,126,0.12)">
+          <svg viewBox="0 0 24 24" style="fill:var(--negative)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        </div>
+        <div class="notif-body">
+          <div class="notif-title">⚡ Portfolio Drift Alert</div>
+          <div class="notif-desc">US Equities allocation reached 68% — above your 60% target. Rebalancing recommended.</div>
+          <div class="notif-time">2 hours ago · Portfolio</div>
+        </div>
+      </div>
+
+      <div class="notif-item unread">
+        <div class="notif-icon-wrap" style="background:rgba(74,158,255,0.12)">
+          <svg viewBox="0 0 24 24" style="fill:var(--accent-blue)"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+        </div>
+        <div class="notif-body">
+          <div class="notif-title">New AI Insight Available</div>
+          <div class="notif-desc">WealthAI has identified a tax-loss harvesting opportunity in your Fixed Income holdings.</div>
+          <div class="notif-time">4 hours ago · AI Advisor</div>
+        </div>
+      </div>
+
+      <div class="notif-item">
+        <div class="notif-icon-wrap" style="background:rgba(34,211,165,0.12)">
+          <svg viewBox="0 0 24 24" style="fill:var(--positive)"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="notif-body">
+          <div class="notif-title">Goal Milestone — Retirement</div>
+          <div class="notif-desc">You've reached 62% of your retirement target. You're 14 months ahead of schedule!</div>
+          <div class="notif-time">8 hours ago · Goals</div>
+        </div>
+      </div>
+
+      <div class="notif-group-label">Yesterday</div>
+
+      <div class="notif-item">
+        <div class="notif-icon-wrap" style="background:rgba(245,200,66,0.12)">
+          <svg viewBox="0 0 24 24" style="fill:var(--accent-gold)"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        </div>
+        <div class="notif-body">
+          <div class="notif-title">Contribution Reminder — Home Fund</div>
+          <div class="notif-desc">Your scheduled $2,540 contribution to Home Purchase goal is due in 3 days.</div>
+          <div class="notif-time">Yesterday · Goals</div>
+        </div>
+      </div>
+
+      <div class="notif-item">
+        <div class="notif-icon-wrap" style="background:rgba(139,108,246,0.12)">
+          <svg viewBox="0 0 24 24" style="fill:var(--accent-purple)"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        </div>
+        <div class="notif-body">
+          <div class="notif-title">Subscription Renewal</div>
+          <div class="notif-desc">Your Advisory Plus plan renews on June 15. Your card ending in 4242 will be charged $49/mo.</div>
+          <div class="notif-time">Yesterday · Billing</div>
+        </div>
+      </div>
+
+      <div class="notif-item">
+        <div class="notif-icon-wrap" style="background:rgba(0,212,180,0.12)">
+          <svg viewBox="0 0 24 24" style="fill:var(--accent-teal)"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+        </div>
+        <div class="notif-body">
+          <div class="notif-title">Market Movement: S&P 500 +1.4%</div>
+          <div class="notif-desc">Markets closed higher. Your portfolio gained $1,240 today. VTI was your top performer.</div>
+          <div class="notif-time">Yesterday · Market</div>
+        </div>
+      </div>
+
+      <div style="height:4px"></div>
+    </div>
+  </div>
+
+  <!-- ============================
+       SCREEN: SUBSCRIPTION
+       ============================ -->
+  <div class="screen" id="screen-subscription">
+    <div class="scroll-area">
+      <div class="screen-header">
+        <div class="screen-title">Subscription</div>
+      </div>
+
+      <!-- Current plan hero -->
+      <div class="sub-hero">
+        <div class="current-badge">✦ Current Plan</div>
+        <div class="plan-name">Advisory Plus</div>
+        <div class="plan-price">$49<span>/month</span></div>
+        <div class="renewal-info">Next renewal: June 15, 2026 · Card ····4242</div>
+      </div>
+
+      <!-- Plans -->
+      <div class="plan-card" style="margin-top:16px">
+        <div class="plan-card-header">
+          <div class="plan-card-name">Free</div>
+          <div class="plan-card-price" style="color:var(--text-secondary)">$0<span>/mo</span></div>
+        </div>
+        <div class="plan-features">
+          <div class="plan-feature included"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>Dashboard overview</div>
+          <div class="plan-feature included"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>1 financial goal</div>
+          <div class="plan-feature excluded"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>AI insights (limited)</div>
+          <div class="plan-feature excluded"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Portfolio analytics</div>
+        </div>
+        <button class="upgrade-btn secondary">Your previous plan</button>
+      </div>
+
+      <div class="plan-card">
+        <div class="plan-card-header">
+          <div class="plan-card-name">Premium Investor</div>
+          <div class="plan-card-price" style="color:var(--accent-blue)">$19<span>/mo</span></div>
+        </div>
+        <div class="plan-features">
+          <div class="plan-feature included"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>Full portfolio analytics</div>
+          <div class="plan-feature included"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>Up to 5 financial goals</div>
+          <div class="plan-feature included"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>AI insights (standard)</div>
+          <div class="plan-feature excluded"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Dedicated advisor access</div>
+          <div class="plan-feature excluded"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Rebalancing automation</div>
+        </div>
+        <button class="upgrade-btn secondary">Downgrade</button>
+      </div>
+
+      <div class="plan-card featured">
+        <div class="plan-card-header">
+          <div>
+            <div class="plan-card-name" style="color:var(--accent-purple)">Advisory Plus ✦</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px">Best for serious investors</div>
+          </div>
+          <div class="plan-card-price" style="color:var(--accent-purple)">$49<span>/mo</span></div>
+        </div>
+        <div class="plan-features">
+          <div class="plan-feature included"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>Unlimited goals & portfolios</div>
+          <div class="plan-feature included"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>Full AI Advisory suite</div>
+          <div class="plan-feature included"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>Human advisor access</div>
+          <div class="plan-feature included"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>Automated rebalancing</div>
+          <div class="plan-feature included"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>Tax-loss harvesting alerts</div>
+          <div class="plan-feature included"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>Priority support & compliance docs</div>
+        </div>
+        <button class="upgrade-btn secondary" style="border-color:rgba(139,108,246,0.3);color:var(--accent-purple)">Current Plan ✓</button>
+      </div>
+
+      <div style="height:4px"></div>
+    </div>
+  </div>
+
+  <!-- ============================
+       SCREEN: EDUCATION
+       ============================ -->
+  <div class="screen" id="screen-education">
+    <div class="scroll-area">
+      <div class="screen-header">
+        <div class="screen-title">Learn</div>
+        <div style="font-size:12px;color:var(--text-secondary)">12 articles · 3 completed</div>
+      </div>
+
+      <div class="edu-categories">
+        <div class="edu-cat active">All</div>
+        <div class="edu-cat">Basics</div>
+        <div class="edu-cat">ETFs</div>
+        <div class="edu-cat">Retirement</div>
+        <div class="edu-cat">Risk</div>
+        <div class="edu-cat">Tax</div>
+      </div>
+
+      <div class="edu-card">
+        <div class="edu-card-thumb" style="background:linear-gradient(135deg,#0d2040,#1a3060)">
+          <svg width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="25" fill="none" stroke="#4a9eff" stroke-width="3" opacity="0.4"/><circle cx="30" cy="30" r="18" fill="none" stroke="#4a9eff" stroke-width="3" opacity="0.6"/><circle cx="30" cy="30" r="8" fill="#4a9eff" opacity="0.8"/><circle cx="30" cy="30" r="3" fill="white"/></svg>
+          <div style="position:absolute;bottom:8px;right:10px;font-size:10px;font-weight:700;color:rgba(74,158,255,0.8);background:rgba(74,158,255,0.1);padding:3px 8px;border-radius:4px">FEATURED</div>
+        </div>
+        <div class="edu-card-body">
+          <div class="edu-card-tags">
+            <div class="edu-tag tag-blue">ETFs</div>
+            <div class="edu-tag tag-teal">Beginner</div>
+          </div>
+          <div class="edu-card-title">Understanding ETFs: The Smart Way to Diversify</div>
+          <div class="edu-card-desc">Exchange-traded funds offer instant diversification at low cost. Learn how they work, why advisors recommend them, and how to choose the right one for your goals.</div>
+          <div class="edu-card-footer">
+            <div class="edu-meta">
+              <div class="edu-meta-item"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>8 min read</div>
+              <div class="edu-meta-item"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>Video</div>
+            </div>
+            <div class="edu-progress">
+              <div class="edu-progress-bar"><div class="edu-progress-fill" style="width:0%;background:var(--accent-blue)"></div></div>
+              <div class="edu-progress-label" style="color:var(--text-muted)">New</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="edu-card">
+        <div class="edu-card-thumb" style="background:linear-gradient(135deg,#0a2020,#0d3028)">
+          <svg width="56" height="56" viewBox="0 0 56 56"><path d="M28 4L4 16v10l24 14 24-14V16L28 4z" fill="none" stroke="#00d4b4" stroke-width="2" opacity="0.5"/><path d="M4 26v10l24 14 24-14V26" fill="none" stroke="#00d4b4" stroke-width="2" opacity="0.3"/></svg>
+          <div style="position:absolute;bottom:8px;right:10px;font-size:10px;font-weight:700;color:rgba(34,211,165,0.8);background:rgba(34,211,165,0.1);padding:3px 8px;border-radius:4px">COMPLETED ✓</div>
+        </div>
+        <div class="edu-card-body">
+          <div class="edu-card-tags">
+            <div class="edu-tag tag-teal">Risk</div>
+            <div class="edu-tag tag-teal">Intermediate</div>
+          </div>
+          <div class="edu-card-title">What is Risk Tolerance and How to Measure It</div>
+          <div class="edu-card-desc">Risk tolerance is more than comfort with volatility — it's about your financial capacity and emotional resilience. Discover how your 67/100 score was calculated.</div>
+          <div class="edu-card-footer">
+            <div class="edu-meta">
+              <div class="edu-meta-item"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>6 min read</div>
+            </div>
+            <div class="edu-progress">
+              <div class="edu-progress-bar"><div class="edu-progress-fill" style="width:100%;background:var(--positive)"></div></div>
+              <div class="edu-progress-label" style="color:var(--positive)">100%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="edu-card">
+        <div class="edu-card-thumb" style="background:linear-gradient(135deg,#201408,#2a1c08)">
+          <svg width="56" height="56" viewBox="0 0 56 56">
+            <rect x="8" y="20" width="10" height="28" fill="#f5c842" opacity="0.7" rx="2"/>
+            <rect x="23" y="12" width="10" height="36" fill="#f5c842" opacity="0.9" rx="2"/>
+            <rect x="38" y="28" width="10" height="20" fill="#f5c842" opacity="0.5" rx="2"/>
+          </svg>
+        </div>
+        <div class="edu-card-body">
+          <div class="edu-card-tags">
+            <div class="edu-tag tag-gold">Diversification</div>
+            <div class="edu-tag tag-gold">Beginner</div>
+          </div>
+          <div class="edu-card-title">The Power of Diversification Explained</div>
+          <div class="edu-card-desc">Don't put all your eggs in one basket. Explore why your portfolio holds 5 asset classes and how correlation math protects you during market downturns.</div>
+          <div class="edu-card-footer">
+            <div class="edu-meta">
+              <div class="edu-meta-item"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>10 min read</div>
+            </div>
+            <div class="edu-progress">
+              <div class="edu-progress-bar"><div class="edu-progress-fill" style="width:55%;background:var(--accent-gold)"></div></div>
+              <div class="edu-progress-label" style="color:var(--accent-gold)">55%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:4px"></div>
+    </div>
+  </div>
+
+  <!-- ============================
+       SCREEN: PROFILE
+       ============================ -->
+  <div class="screen" id="screen-profile">
+    <div class="scroll-area">
+      <div class="screen-header">
+        <div class="screen-title">Profile</div>
+        <div class="icon-btn" onclick="setTab('subscription')"><svg viewBox="0 0 24 24" style="fill:var(--accent-purple)"><path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-4h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5z"/></svg></div>
+      </div>
+
+      <!-- Profile Hero -->
+      <div class="profile-hero">
+        <div class="avatar-wrap">
+          <div class="avatar">AM</div>
+          <div class="avatar-badge">PLUS</div>
+        </div>
+        <div class="profile-info">
+          <div class="profile-name">Alex Morgan</div>
+          <div class="profile-email">alex.morgan@email.com</div>
+          <div class="profile-since">Member since Jan 2023 · Advisory Plus</div>
+        </div>
+        <div class="edit-btn"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>
+      </div>
+
+      <!-- Risk Profile Card -->
+      <div class="risk-profile-card">
+        <div class="rp-header">
+          <div class="rp-title">Risk Profile</div>
+          <div class="rp-badge">Moderate Growth</div>
+        </div>
+        <div class="risk-meter">
+          <div class="risk-fill"></div>
+          <div class="risk-pointer"></div>
+        </div>
+        <div class="risk-labels">
+          <span class="risk-label">Conservative</span>
+          <span class="risk-label">Moderate</span>
+          <span class="risk-label">Aggressive</span>
+        </div>
+        <div class="risk-score-display">
+          <div class="rsd-val">67 / 100</div>
+          <div class="rsd-label">Risk Score · Last assessed Jan 2025</div>
+        </div>
+      </div>
+
+      <!-- Settings Sections -->
+      <div class="settings-section">
+        <div class="settings-section-title">Account</div>
+        <div class="settings-item">
+          <div class="settings-icon" style="background:rgba(74,158,255,0.12)"><svg viewBox="0 0 24 24" style="fill:var(--accent-blue)"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+          <div class="settings-text"><h4>Personal Information</h4><p>Name, address, date of birth</p></div>
+          <div class="settings-arrow"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-icon" style="background:rgba(0,212,180,0.12)"><svg viewBox="0 0 24 24" style="fill:var(--accent-teal)"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg></div>
+          <div class="settings-text"><h4>Connected Accounts</h4><p>Bank, brokerage connections</p></div>
+          <div class="settings-value">2 linked</div>
+          <div class="settings-arrow"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
+        </div>
+        <div class="settings-item" onclick="setTab('subscription')">
+          <div class="settings-icon" style="background:rgba(139,108,246,0.12)"><svg viewBox="0 0 24 24" style="fill:var(--accent-purple)"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg></div>
+          <div class="settings-text"><h4>Subscription & Billing</h4><p>Advisory Plus · $49/mo</p></div>
+          <div class="settings-arrow"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Security & Privacy</div>
+        <div class="settings-item">
+          <div class="settings-icon" style="background:rgba(245,200,66,0.12)"><svg viewBox="0 0 24 24" style="fill:var(--accent-gold)"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></div>
+          <div class="settings-text"><h4>Change Password</h4></div>
+          <div class="settings-arrow"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-icon" style="background:rgba(34,211,165,0.12)"><svg viewBox="0 0 24 24" style="fill:var(--positive)"><path d="M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.68-.2-.13-.24-.04-.55.2-.68C7.82 2.52 9.86 2 12.01 2c2.13 0 3.99.47 6.03 1.52.25.13.34.43.21.67-.09.18-.26.28-.44.28z"/></svg></div>
+          <div class="settings-text"><h4>Biometric Authentication</h4><p>Face ID enabled</p></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-icon" style="background:rgba(255,107,138,0.12)"><svg viewBox="0 0 24 24" style="fill:var(--accent-rose)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div>
+          <div class="settings-text"><h4>Two-Factor Authentication</h4><p>SMS + Authenticator</p></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Compliance & Legal</div>
+        <div class="settings-item">
+          <div class="settings-icon" style="background:rgba(74,158,255,0.08)"><svg viewBox="0 0 24 24" style="fill:var(--text-secondary)"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg></div>
+          <div class="settings-text"><h4>Form ADV — Advisory Disclosure</h4></div>
+          <div class="settings-arrow"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-icon" style="background:rgba(74,158,255,0.08)"><svg viewBox="0 0 24 24" style="fill:var(--text-secondary)"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></div>
+          <div class="settings-text"><h4>Risk Profile Assessment</h4><p>Last updated Jan 2025</p></div>
+          <div class="settings-arrow"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-icon" style="background:rgba(74,158,255,0.08)"><svg viewBox="0 0 24 24" style="fill:var(--text-secondary)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></div>
+          <div class="settings-text"><h4>Privacy Policy & Terms</h4></div>
+          <div class="settings-arrow"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
+        </div>
+      </div>
+
+      <!-- Architecture Note -->
+      <div class="arch-note">
+        <div class="arch-note-title">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          Architecture Note (Dev Preview)
+        </div>
+        <p>• Django/DRF backend: JWT access + refresh tokens stored in secure keychain (Keychain on iOS, Keystore on Android). Tokens auto-refresh via interceptor.</p>
+        <p>• API layer: All calls routed through /services/ folder. axios instance with base URL pointed at AWS API Gateway → Django backend.</p>
+        <p>• Real-time: WebSocket via Django Channels for portfolio ticks + push via APNs/FCM through AWS SNS.</p>
+        <p>• Sensitive data: Never stored in AsyncStorage; encrypted keychain only. Financial values masked until biometric auth confirmed.</p>
+        <p>• Scale path: This mock maps 1:1 to production API endpoints. Replace mockData/ with live service calls to go live.</p>
+      </div>
+
+      <button class="logout-btn" onclick="navigateTo('onboarding')">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- ============================
+       BOTTOM NAVIGATION
+       ============================ -->
+  <div class="bottom-nav" id="bottomNav" style="display:none">
+    <div class="nav-item active" id="nav-home" onclick="setTab('home')">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span>Home</span>
+    </div>
+    <div class="nav-item" id="nav-portfolio" onclick="setTab('portfolio')">
+      <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+      <span>Portfolio</span>
+    </div>
+    <div class="nav-item" id="nav-goals" onclick="setTab('goals')">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <span>Goals</span>
+    </div>
+    <div class="nav-item" id="nav-advisor" onclick="setTab('advisor')">
+      <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+      <span>AI</span>
+    </div>
+    <div class="nav-item" id="nav-profile" onclick="setTab('profile')">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <span>Profile</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================
+// App Navigation State
+// ============================
+const APP_SCREENS = ['home', 'portfolio', 'goals', 'advisor', 'profile', 'notifications', 'subscription', 'education'];
+const NAV_TABS = ['home', 'portfolio', 'goals', 'advisor', 'profile'];
+
+let currentScreen = 'onboarding';
+let isLoggedIn = false;
+
+function navigateTo(screen) {
+  // Hide all screens
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  // Show target
+  const target = document.getElementById('screen-' + screen);
+  if (target) {
+    target.classList.add('active');
+    currentScreen = screen;
+  }
+  // Show/hide bottom nav
+  const nav = document.getElementById('bottomNav');
+  if (APP_SCREENS.includes(screen)) {
+    nav.style.display = 'flex';
+    updateNavActive(screen);
+  } else {
+    nav.style.display = 'none';
+  }
+}
+
+function setTab(tab) {
+  navigateTo(tab);
+  updateNavActive(tab);
+}
+
+function updateNavActive(tab) {
+  NAV_TABS.forEach(t => {
+    const el = document.getElementById('nav-' + t);
+    if (el) el.classList.toggle('active', t === tab);
+  });
+}
+
+function doLogin() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position:absolute;inset:0;background:rgba(8,12,20,0.9);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:999;border-radius:48px;
+  `;
+  overlay.innerHTML = `
+    <div style="width:48px;height:48px;border:3px solid rgba(74,158,255,0.3);border-top-color:var(--accent-blue);border-radius:50%;animation:spin 0.9s linear infinite;margin-bottom:16px"></div>
+    <div style="font-family:var(--font-display);font-size:14px;color:var(--text-secondary)">Verifying credentials…</div>
+  `;
+  document.querySelector('.phone-shell').appendChild(overlay);
+  setTimeout(() => {
+    overlay.remove();
+    isLoggedIn = true;
+    navigateTo('home');
+  }, 1400);
+}
+
+function loginWithBio() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position:absolute;inset:0;background:rgba(8,12,20,0.95);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:999;border-radius:48px;
+  `;
+  overlay.innerHTML = `
+    <div style="width:72px;height:72px;background:rgba(74,158,255,0.1);border:2px solid rgba(74,158,255,0.3);border-radius:20px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;animation:pulse 1s infinite">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="var(--accent-blue)"><path d="M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.68-.2-.13-.24-.04-.55.2-.68C7.82 2.52 9.86 2 12.01 2c2.13 0 3.99.47 6.03 1.52.25.13.34.43.21.67-.09.18-.26.28-.44.28z"/></svg>
+    </div>
+    <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:6px">Face ID</div>
+    <div style="font-size:13px;color:var(--text-secondary)">Look at your device to authenticate</div>
+  `;
+  document.querySelector('.phone-shell').appendChild(overlay);
+  setTimeout(() => {
+    overlay.innerHTML = `
+      <div style="width:72px;height:72px;background:rgba(34,211,165,0.15);border:2px solid rgba(34,211,165,0.4);border-radius:20px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="var(--positive)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+      </div>
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--positive)">Authenticated</div>
+    `;
+    setTimeout(() => { overlay.remove(); isLoggedIn = true; navigateTo('home'); }, 700);
+  }, 1200);
+}
+
+// Tab switching for mini chart tabs
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('mc-tab')) {
+    e.target.closest('.mc-tabs').querySelectorAll('.mc-tab').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+  }
+  if (e.target.classList.contains('filter-chip')) {
+    e.target.closest('.notif-filter, .edu-categories').querySelectorAll('.filter-chip, .edu-cat').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+  }
+  if (e.target.classList.contains('edu-cat')) {
+    e.target.closest('.edu-categories').querySelectorAll('.edu-cat').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+  }
+});
+
+// ============================
+// Boot Sequence
+// ============================
+window.addEventListener('load', function() {
+  setTimeout(() => {
+    const lo = document.getElementById('loadingOverlay');
+    lo.style.opacity = '0';
+    setTimeout(() => {
+      lo.style.display = 'none';
+      navigateTo('onboarding');
+    }, 500);
+  }, 1800);
+});
+</script>
+</body>
+</html>
